@@ -1,0 +1,9 @@
+# research skill dependencies — Python 3.10+
+# install: pip install -r requirements.txt
+pymupdf>=1.26        # PDF text extraction (pdf_extract.py)
+matplotlib>=3.8      # plotting engine (figstyle.py)
+rdkit>=2024.3        # molecular structure drawing (molfig.py)
+python-pptx>=1.0     # slide deck generation (make_deck.py)
+pillow>=10.0         # image processing (figstyle/make_deck/molfig)
+certifi>=2024.2      # CA bundle for dblp_verify.py (hostile-chain hosts)
+numpy>=1.26          # transitive via matplotlib/pandas; pinned for exp flows
