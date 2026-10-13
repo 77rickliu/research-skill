@@ -44,8 +44,7 @@ argument-hint: "[lit|read|review|write|exp|watch|slides|mol] （也可以直接�
 | `/research slides <outline.md>` | 流程 G：论文/综述转 PPT |
 | `/research mol <SMILES>` | 流程 H：分子结构图（生物/化学） |
 
-Python 解释器选择（按序尝试，用第一个可用的）：
-1. DSH 捆绑解释器：`<DSH-bundled-python>\python.exe (DSH: %USERPROFILE%\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe)`（存在才用）
+1. DSH 捆绑解释器（存在才用）：`%USERPROFILE%\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe`
 2. 其他宿主：`python3` 或 `py`（PATH 上的 Python 3.10+，需已装 requirements.txt 的依赖）
 
 ## 硬规则（每次必须遵守）
@@ -73,17 +72,30 @@ Python 解释器选择（按序尝试，用第一个可用的）：
 
 ## 流程 B：精读笔记（read）
 
-1. 运行 `pdf_extract.py <pdf> --out research/notes/_extract/<key>.md`。
-2. 若输出含 "scanned pages" 警告：告知用户该 PDF 无文本层，摘要级笔记 + 建议换源，不硬编内容。
-3. 通读抽取文本，按 `templates/note.md` 写 `research/notes/<key>.md`。每个栏目必须落到原文证据（可引用原文短语），写不出就留空 + `【原文未明确】`。
-4. 该论文若无 bib 条目 → 按硬规则 3 补入。
+1. **先定深度**（用户没说就问一句，或按场景默认）：这论文是筛选对象（scan）还是主线文献（understand，默认）还是复现/审稿目标（reconstruct）？scan 只产出 Q1 一节，不写全量笔记。
+2. **识别论文类型**（实验实证/理论证明/方法系统/综述/基准/观点），写进笔记元数据，Q2/Q3 的侧重点按类型走（理论重证明路径，实证重对照与混杂，综述重分类框架，基准重公平条件）。
+3. 运行 `pdf_extract.py <pdf> --out research/notes/_extract/<key>.md`。
+4. 若输出含 "scanned pages" 警告：告知用户该 PDF 无文本层，摘要级笔记 + 建议换源，不硬编内容。
+5. 通读抽取文本，按 `templates/note.md` 的**四问题框架**写 `research/notes/<key>.md`。硬规则：
+   - 每条论断落到原文证据（原文短语/公式号/图表号），写不出就留空 + `【原文未明确】`；
+   - 抽取文本里的**数字**一律标 `⚠️ 数字待对原文`（文本抽取最易错的就是数字与下标）；
+   - reconstruct 深度必须完成"最小例子走通机制"一节；understand 可留空；
+   - **"与已有笔记的关联"**：扫描 research/notes/ 找相关论文，写承接/对比/互补关系——单篇笔记的价值随关联增加。
+6. 该论文若无 bib 条目 → 按硬规则 3 补入。
+7. scan 深度的笔记单独存 `research/notes/_scan/<key>.md`，与精读笔记分开；学生判断值得深读后再升级跑全量。
 
 ## 流程 C：综述（review）
 
-1. 读 `research/lit/<主题>.md` 与相关 notes；不存在的先提示用户先跑 lit/read。
-2. 按 `templates/review.md` 聚类写作；每个论断挂 `[key]` 引用，只用已有笔记/清单覆盖的论文。
-3. 参考文献一节只列 bib.bib 中存在的条目（`bib.py keys` 核对）。
-4. 定稿前跑 `cite_sync.py`，MISSING 必须清零。
+1. **先问综述类型与 RQ**：学位论文综述章 / 期刊独立综述 / 引言 mini 综述？研究问题（RQ）是什么？没有 RQ 就和用户一起提炼一句——没有 RQ 的综述没有方向。
+2. 读 `research/lit/<主题>.md`、相关 notes 与 `_scan/` 快筛笔记；不存在的先提示用户先跑 lit/read。
+3. **先填概念矩阵**（`templates/concept-matrix.md`，存 `research/review/<主题>-matrix.md`）：行=论文，列=概念（3-7 列，概念名用论文原文用语）。**按概念聚类，不按作者**——这是防堆砌病的根本手段，Webster & Watson 概念中心法。
+4. 按 `templates/review.md` 写作，硬规则：
+   - 每段**不允许以作者名开头**，每段至少一处批判性内容（分歧及原因/方法学评价/边界质疑）；
+   - 每个论断挂 `[key]`，只用笔记/矩阵覆盖的论文；
+   - gap 一节按六类（结论性/方法学/对象/知识/实证/理论）对照填写，**逐条对应 RQ**；
+   - 分歧分析必填"分歧为何"（方法？样本？时代？场景？）——写不出说明读得不够，回去补笔记而不是编。
+5. 参考文献一节只列 bib.bib 中存在的条目（`bib.py keys` 核对）。
+6. 定稿前跑 `cite_sync.py`，MISSING 必须清零；再过一遍模板自带的 Boote & Beile 精简自检 8 条，有一条不过就修，不带病交付。
 
 ## 流程 D：写作（write）
 
